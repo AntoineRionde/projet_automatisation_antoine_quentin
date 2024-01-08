@@ -1,0 +1,39 @@
+version: "3.8"
+networks:
+    api.net:
+        driver: bridge
+
+services:
+  api.api:
+    image: 'canals/php:latest'
+    environment:
+      MYSQL_HOST: ${DB_HOST:-api.db}
+      MYSQL_DATABASE: ${DB_DATABASE:-database}
+      MYSQL_USER: ${DB_USER_NAME:-user}
+      MYSQL_PASSWORD: ${DB_USER_PASSWORD:-password}
+    ports:
+      - '2080:80'
+    volumes:
+      - ./api/public/:/var/www/html
+      - ./api/:/var/www
+    working_dir: /var/www/
+    networks:
+      api.net:
+        aliases:
+          - api
+    depends_on:
+        - api.db
+  api.db:
+    image: 'mysql:latest'
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${DB_DATABASE:-database}
+      MYSQL_USER: ${DB_USER_NAME:-user}
+      MYSQL_PASSWORD: ${DB_USER_PASSWORD:-password}
+    ports:
+      - '3306:3306'
+    networks:
+        - api.net
+
+
+
